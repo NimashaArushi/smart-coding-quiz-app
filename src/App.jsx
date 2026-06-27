@@ -1,4 +1,6 @@
 import{useState}from 'react';
+
+
 const quizeQuestions=[{
     id:1,
     question:"Which of the following is NOT a primitive data type in java",
@@ -28,6 +30,24 @@ const quizeQuestions=[{
 
 function App(){
     const [currentQuestion, setCurrentQuestion] = useState(0);
+    const[selectedOption,setSelectedOption]=useState(null);
+
+    const handleAnswerClick=(option)=>{
+      setSelectedOption(option);
+    }
+
+const handleNextClick=()=>{
+  setCurrentQuestion(currentQuestion+1);
+  setSelectedOption(null);
+}
+
+const handlebackClick=()=>{
+  setCurrentQuestion(currentQuestion-1);
+  setSelectedOption(null);
+}
+
+
+    
     return (
         //heading
         <div style={{
@@ -56,18 +76,64 @@ function App(){
           flexDirection: 'column',
           gap: '10px'
         }}>
-          {quizeQuestions[currentQuestion].options.map((option, index) => (
-            <button
-              key={index}
-              style={{ padding: '12px', fontSize: '16px', cursor: 'pointer', borderRadius: '5px', border: '1px solid #23a6d5', background: '#fff', transition: '0.2s' }}
-            >
-              {option}
-            </button>
-          ))}
+
+{quizeQuestions[currentQuestion].options.map((option, index) => {
+           
+            const isSelected = selectedOption === option;
+
+            return (
+              <button
+                key={index}
+                onClick={() => handleAnswerClick(option)} 
+                style={{ 
+                  padding: '12px', 
+                  fontSize: '16px',
+                  cursor: 'pointer', 
+                  borderRadius: '5px', 
+                  border: '1px solid #23a6d5', 
+                  background: isSelected ? '#018b2f' : '#fff', 
+                                   transition: '0.2s' 
+                }}
+              >
+                {option}
+              </button>
+            );
+          })}
         </div>
+<button
+onClick={handleNextClick}
+style={{
+  marginTop:'20px',
+  padding: '10px 20px',
+   fontSize: '16px',
+   backgroundColor: '#23a6d5',
+   color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+   cursor: 'pointer' 
+}}>
+  Next Question ➡️
+</button>
+
+
+<button
+onClick={handlebackClick}
+style={{
+  marginTop:'20px',
+  padding: '10px 20px',
+   fontSize: '16px',
+   backgroundColor: '#c51205',
+   color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    marginLeft:'10px',
+   cursor: 'pointer' 
+}}>
+  Back Question ⬅️
+</button>
+
       </div>
     </div>
   ); 
 }
-
 export default App;
