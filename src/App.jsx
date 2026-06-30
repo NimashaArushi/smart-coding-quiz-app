@@ -30,11 +30,16 @@ const quizeQuestions = [
 function App() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
-  const [skippedQuestions, setSkippedQuestions] = useState([]); // Variable name එක නිවැරදි කළා
+  const [skippedQuestions, setSkippedQuestions] = useState([]); 
   const [isReviewingSkips, setIsReviewingSkips] = useState(false);
+  const [score, setScore] = useState(0);
+  const [isQuizFinished, setIsQuizFinished] = useState(false); // 🛠️ මෙතන තිබ්බ 'constis' ලෙඩේ හැදුවා!
 
   const handleAnswerClick = (option) => {
     setSelectedOption(option);
+    if (option === quizeQuestions[currentQuestion].correctAnswer) {
+      setScore(score + 1);
+    }
   };
 
   const handleNextClick = () => {
@@ -59,7 +64,7 @@ function App() {
           setCurrentQuestion(finalSkips[0]);
           setSelectedOption(null);
         } else {
-          alert("Quiz successfully finished! 🎉");
+          setIsQuizFinished(true);
         }
       }
     } else {
@@ -69,7 +74,7 @@ function App() {
         setCurrentQuestion(skippedQuestions[currentSkipIndex + 1]);
         setSelectedOption(null);
       } else {
-        alert("All skipped questions done! 🎉");
+        setIsQuizFinished(true);
       }
     }
   };
@@ -81,6 +86,15 @@ function App() {
     }
   };
 
+  const handleRestartQuiz = () => {
+    setCurrentQuestion(0);
+    setSelectedOption(null);
+    setSkippedQuestions([]);
+    setIsReviewingSkips(false);
+    setScore(0);
+    setIsQuizFinished(false);
+  };
+
   return (
     <div style={{
         padding: '20px',
@@ -89,96 +103,130 @@ function App() {
     }}>
       <h1>Smart Coding Quiz App 🧠</h1>
       
-      {/* Quiz Card */}
-      <div style={{ 
+      {isQuizFinished ? (
+        
+        <div style={{ 
             margin: '20px auto', 
-            padding: '20px', 
+            padding: '30px', 
             maxWidth: '500px',
-            border: '1px solid #ccc', 
+            border: '2px solid #018b2f', 
             borderRadius: '10px', 
-            boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+            boxShadow: '0 4px 15px rgba(0,0,0,0.15)',
+            backgroundColor: '#f9f9f9'
         }}>
-
-        <h3>
-          {isReviewingSkips 
-            ? `Reviewing Skipped Question (ID: ${quizeQuestions[currentQuestion].id})` 
-            : `Question ${currentQuestion + 1} of ${quizeQuestions.length}`}
-        </h3>
-
-        <p style={{ fontSize: '18px', fontWeight: 'bold', margin: '20px 0' }}>
-          {quizeQuestions[currentQuestion].question}
-        </p>
-
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '10px'
-        }}>
-          {quizeQuestions[currentQuestion].options.map((option, index) => {
-            const isSelected = selectedOption === option;
-
-            return (
-              <button
-                key={index}
-                onClick={() => handleAnswerClick(option)} 
-                style={{ 
-                  padding: '12px', 
-                  fontSize: '16px',
-                  cursor: 'pointer', 
-                  borderRadius: '5px', 
-                  border: '1px solid #23a6d5', 
-                  background: isSelected ? '#018b2f' : '#fff', 
-                  color: isSelected ? '#fff' : '#000',
-                  transition: '0.2s' 
-                }}
-              >
-                {option}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* 🎛️ බටන් දෙක තැඹිලි පාට වෙලාවේ මිරිකෙන්නේ නැති වෙන්න Flex Row එකක් හැදුවා */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '15px', marginTop: '20px' }}>
+          <h2>Quiz Completed! 🎉</h2>
+          <p style={{ fontSize: '20px', margin: '20px 0' }}>
+            Your Score: <strong>{score}</strong> / {quizeQuestions.length}
+          </p>
           
           <button
-            onClick={handlebackClick}
-            disabled={currentQuestion === 0 || isReviewingSkips} // Skip Review එකේදී Back යන්න ඕන නැති නිසා disable කළා
+            onClick={handleRestartQuiz}
             style={{
-              flex: 1,
-              padding: '10px 20px',
+              padding: '12px 25px',
               fontSize: '16px',
-              backgroundColor: (currentQuestion === 0 || isReviewingSkips) ? '#e0e0e0' : '#cccccc',
-              color: (currentQuestion === 0 || isReviewingSkips) ? '#a0a0a0' : '#202020',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: (currentQuestion === 0 || isReviewingSkips) ? 'not-allowed' : 'pointer'
-            }}
-          >
-            ⬅️ Back Question
-          </button>
-
-          <button
-            onClick={handleNextClick}
-            style={{
-              flex: 1,
-              padding: '10px 20px',
-              fontSize: '16px',
-              backgroundColor: selectedOption === null ? '#f39c12' : '#23a6d5', 
+              fontWeight: 'bold',
+              backgroundColor: '#23a6d5',
               color: 'white',
               border: 'none',
               borderRadius: '5px',
               cursor: 'pointer'
             }}
           >
-            {selectedOption === null ? 'Skip ➡️' : 'Next Question ➡️'}
+            Restart Quiz 🔄
           </button>
-
         </div>
 
-      </div>
+      ) : (
+
+        <div style={{ 
+              margin: '20px auto', 
+              padding: '20px', 
+              maxWidth: '500px',
+              border: '1px solid #ccc', 
+              borderRadius: '10px', 
+              boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+          }}>
+
+          <h3>
+            {isReviewingSkips 
+              ? `Reviewing Skipped Question (ID: ${quizeQuestions[currentQuestion].id})` 
+              : `Question ${currentQuestion + 1} of ${quizeQuestions.length}`}
+          </h3>
+
+          <p style={{ fontSize: '18px', fontWeight: 'bold', margin: '20px 0' }}>
+            {quizeQuestions[currentQuestion].question}
+          </p>
+
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '10px'
+          }}>
+            {quizeQuestions[currentQuestion].options.map((option, index) => {
+              const isSelected = selectedOption === option;
+
+              return (
+                <button
+                  key={index}
+                  onClick={() => handleAnswerClick(option)} 
+                  style={{ 
+                    padding: '12px', 
+                    fontSize: '16px',
+                    cursor: 'pointer', 
+                    borderRadius: '5px', 
+                    border: '1px solid #23a6d5', 
+                    background: isSelected ? '#018b2f' : '#fff', 
+                    color: isSelected ? '#fff' : '#000',
+                    transition: '0.2s' 
+                  }}
+                >
+                  {option}
+                </button>
+              );
+            })}
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '15px', marginTop: '20px' }}>
+            
+            <button
+              onClick={handlebackClick}
+              disabled={currentQuestion === 0 || isReviewingSkips}
+              style={{
+                flex: 1,
+                padding: '10px 20px',
+                fontSize: '16px',
+                backgroundColor: (currentQuestion === 0 || isReviewingSkips) ? '#e0e0e0' : '#cccccc',
+                color: (currentQuestion === 0 || isReviewingSkips) ? '#a0a0a0' : '#202020',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: (currentQuestion === 0 || isReviewingSkips) ? 'not-allowed' : 'pointer'
+              }}
+            >
+              ⬅️ Back Question
+            </button>
+
+            <button
+              onClick={handleNextClick}
+              style={{
+                flex: 1,
+                padding: '10px 20px',
+                fontSize: '16px',
+                backgroundColor: selectedOption === null ? '#f39c12' : '#23a6d5', 
+                color: 'white',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer'
+              }}
+            >
+              {selectedOption === null ? 'Skip ➡️' : 'Next Question ➡️'}
+            </button>
+
+          </div>
+
+        </div>
+      )}
     </div>
-  ); 
+  );
 }
 
 export default App;
